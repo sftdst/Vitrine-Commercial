@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Presentation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class PresentationController extends Controller
 {
@@ -29,7 +31,18 @@ class PresentationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'titre' => 'required',
+            'description' => 'required',
+            'statut' => 'required',
+        ]);
+
+        $present = new Presentation;
+        $present->titre = $request->titre;
+        $present->description = $request->description;
+        $request->statut = $request->statut;
+        $present->save();
+        return redirect()->route('presentation')->with('success', 'Ajout réussit.');
     }
 
     /**
@@ -43,24 +56,38 @@ class PresentationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Presentation $presentation)
+    public function edit(Request $request,$id)
     {
-        //
+
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Presentation $presentation)
+    public function update(Request $request,$id)
     {
-        //
+        $request->validate([
+            'titre' => 'required',
+            'description' => 'required',
+            'statut' => 'required',
+        ]);
+
+        DB::table('presentations')->whereId($id)->update([
+            'titre' => $request->titre,
+            'description' => $request->description,
+            'statut' => $request->statut,
+
+        ]);
+        return redirect()->route('presentation')->with('success', 'Modification réussit.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Presentation $presentation)
+    public function destroy($id)
     {
-        //
+        Presentation::find($id)->delete();
+        return redirect()->route('presentation')->with('success', 'suppression  réussit.');
+
     }
 }

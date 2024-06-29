@@ -29,7 +29,21 @@ class GalleryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+
+        ]);
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+        }
+        $gallery = new Gallery;
+        $gallery->image = 'images/'.$imageName;
+        $gallery->save();
+
+        return redirect()->route('gallery')->with('success', 'ajouter avec success.');
     }
 
     /**
@@ -59,8 +73,10 @@ class GalleryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Gallery $gallery)
+    public function destroy($id)
     {
-        //
+        Gallery::find($id)->delete();
+        return redirect()->route('gallery')->with('success', 'ajouter avec success.');
+
     }
 }

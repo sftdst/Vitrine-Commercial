@@ -12,8 +12,8 @@ class PartenaireController extends Controller
      */
     public function index()
     {
-        $parts = Partenaire::all();
-        return view('admin.partenaire',compact('parts'));
+        $partenaires = Partenaire::all();
+        return view('admin.partenaire',compact('partenaires'));
     }
 
     /**
@@ -29,7 +29,22 @@ class PartenaireController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nom' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+
+        ]);
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time().'.'.$image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imageName);
+        }
+        $partenaire = new Partenaire;
+        $partenaire->nom = $request->nom;
+        $partenaire->logo = 'images/'.$imageName;
+        $partenaire->save();
+        return redirect()->route('partenaire')->with('success', 'ajouter avec success.');
     }
 
     /**
@@ -53,14 +68,15 @@ class PartenaireController extends Controller
      */
     public function update(Request $request, Partenaire $partenaire)
     {
-        //
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Partenaire $partenaire)
+    public function destroy($id)
     {
-        //
+        Partenaire::find($id)->delete();
+        return redirect()->route('partenaire');
     }
 }
